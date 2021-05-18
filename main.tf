@@ -56,7 +56,6 @@ resource "aws_vpc_dhcp_options_association" "this" {
 resource "aws_internet_gateway" "this" {
   count  = length(var.public_subnets) > 0 ? 1 : 0
   vpc_id = local.vpc_id
-  tags   = merge(map("Name", format("%s", var.name)), var.tags, var.igw_tags)
 }
 
 ################
@@ -65,7 +64,6 @@ resource "aws_internet_gateway" "this" {
 resource "aws_route_table" "public" {
   count  = length(var.public_subnets) > 0 ? 1 : 0
   vpc_id = local.vpc_id
-  tags   = merge(map("Name", format("%s-${var.public_subnet_suffix}", var.name)), var.tags, var.public_route_table_tags)
 }
 
 resource "aws_route" "public_internet_gateway" {
@@ -87,8 +85,6 @@ resource "aws_route_table" "private_ngw" {
 
   vpc_id = local.vpc_id
 
-  tags = merge(map("Name", (var.single_nat_gateway ? "${var.name}-${var.private_subnet_suffix}" : format("%s-${var.private_subnet_suffix}-%s", var.name, element(var.azs, count.index)))), var.tags, var.private_route_table_tags)
-
   lifecycle {
     # When attaching VPN gateways it is common to define aws_vpn_gateway_route_propagation
     # resources that manipulate the attributes of the routing table (typically for the private subnets)
@@ -100,8 +96,6 @@ resource "aws_route_table" "private_tgw" {
   count = var.transit_gateway_id != null ? 1 : 0
 
   vpc_id = local.vpc_id
-
-  tags = merge(map("Name", (var.single_nat_gateway ? "${var.name}-${var.private_subnet_suffix}" : format("%s-${var.private_subnet_suffix}-%s", var.name, element(var.azs, count.index)))), var.tags, var.private_route_table_tags)
 
   lifecycle {
     # When attaching VPN gateways it is common to define aws_vpn_gateway_route_propagation
@@ -134,7 +128,6 @@ resource "aws_subnet" "public" {
   cidr_block              = each.value.cidr_block
   availability_zone       = element(var.azs, each.value.availability_zone_index % length(var.azs))
   map_public_ip_on_launch = var.map_public_ip_on_launch
-  tags                    = merge(map("Name", each.key), var.tags, var.public_subnet_tags)
 }
 
 
@@ -148,7 +141,6 @@ resource "aws_subnet" "private" {
   vpc_id            = local.vpc_id
   cidr_block        = each.value.cidr_block
   availability_zone = element(var.azs, each.value.availability_zone_index % length(var.azs))
-  tags              = merge(map("Name", each.key), var.tags, var.private_subnet_tags)
 }
 
 ################
@@ -240,7 +232,7 @@ resource "aws_security_group" "glue_endpoint" {
   name        = "vpce_glue"
   description = "Allow instances to access Glue interface endpoint over HTTPS"
   vpc_id      = local.vpc_id
-  tags        = merge(map("Name", "vpce_glue"), var.tags)
+  tags        = merge({"Name"="vpce_glue"}, var.tags)
 }
 
 resource "aws_security_group_rule" "glue_endpoint_rule" {
@@ -278,7 +270,6 @@ resource "aws_security_group" "kms_endpoint" {
   name        = "vpce_kms"
   description = "Allow instances to access KMS interface endpoint over HTTPS"
   vpc_id      = local.vpc_id
-  tags        = merge(map("Name", "vpce_kms"), var.tags)
 }
 
 resource "aws_security_group_rule" "kms_endpoint_rule" {
@@ -316,7 +307,6 @@ resource "aws_security_group" "secrets_endpoint" {
   name        = "vpce_secrets"
   description = "Allow instances to access Secrets interface endpoint over HTTPS"
   vpc_id      = local.vpc_id
-  tags        = merge(map("Name", "vpce_secrets"), var.tags)
 }
 
 resource "aws_security_group_rule" "secrets_endpoint_rule" {
@@ -354,7 +344,6 @@ resource "aws_security_group" "sns_endpoint" {
   name        = "vpce_sns"
   description = "Allow instances to access SNS interface endpoint over HTTPS"
   vpc_id      = local.vpc_id
-  tags        = merge(map("Name", "vpce_sns"), var.tags)
 }
 
 resource "aws_security_group_rule" "sns_endpoint_rule" {
@@ -454,7 +443,6 @@ resource "aws_security_group" "ssm_endpoint" {
   name        = "vpce_session_manager"
   description = "Allow instances to access Session Manager interface endpoints over HTTPS"
   vpc_id      = local.vpc_id
-  tags        = merge(map("Name", "vpce_session_manager"), var.tags)
 }
 
 resource "aws_security_group_rule" "ssm_endpoint_rule" {
@@ -492,7 +480,6 @@ resource "aws_security_group" "sts_endpoint" {
   name        = "vpce_sts"
   description = "Allow instances to access STS interface endpoint over HTTPS"
   vpc_id      = local.vpc_id
-  tags        = merge(map("Name", "vpce_sts"), var.tags)
 }
 
 resource "aws_security_group_rule" "sts_endpoint_rule" {
@@ -524,7 +511,6 @@ resource "aws_vpc_endpoint" "vpc_interface_endpoints" {
   private_dns_enabled = true
   subnet_ids          = local.vpce_subnets
   security_group_ids  = [aws_security_group.vpc_interface_endpoints[each.key].id]
-  tags        = merge(map("Name", "vpce_${each.key}"), var.tags)
 }
 
 resource "aws_security_group" "vpc_interface_endpoints" {
@@ -532,7 +518,6 @@ resource "aws_security_group" "vpc_interface_endpoints" {
   name        = "vpce_${each.key}"
   description = "Allow instances to access ${each.key} interface endpoint over HTTPS"
   vpc_id      = local.vpc_id
-  tags        = merge(map("Name", "vpce_${each.key}"), var.tags)
 }
 
 resource "aws_security_group_rule" "vpc_interface_endpoints" {
@@ -574,7 +559,6 @@ resource "aws_vpn_gateway" "this" {
   count           = var.enable_vpn_gateway ? 1 : 0
   vpc_id          = local.vpc_id
   amazon_side_asn = var.amazon_side_asn
-  tags            = merge(map("Name", format("%s", var.name)), var.tags, var.vpn_gateway_tags)
 }
 
 resource "aws_vpn_gateway_attachment" "this" {
