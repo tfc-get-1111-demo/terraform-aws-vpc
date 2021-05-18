@@ -5,7 +5,7 @@ terraform {
 locals {
   nat_gateway_count = var.single_nat_gateway ? 1 : (var.one_nat_gateway_per_az ? length(var.azs) : length(var.private_subnets))
   vpc_id            = aws_vpc.this.id
-  vpce_subnets      = [for i in aws_subnet.private : i.id if contains(var.interface_endpoint_subnets, i.tags["Name"])]
+  # vpce_subnets      = [for i in aws_subnet.private : i.id if contains(var.interface_endpoint_subnets, i.tags["Name"])]
 }
 
 ######

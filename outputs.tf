@@ -53,10 +53,10 @@ output "private_subnets" {
   value       = [for subnet in aws_subnet.private : subnet.id]
 }
 
-output "transit_gateway_subnets" {
-  description = "List of IDs of any private subnets designated for transit gateway"
-  value       = [for subnet in aws_subnet.private : subnet.id if length(regexall("tgw", subnet.tags.Name)) > 0]
-}
+# output "transit_gateway_subnets" {
+#   description = "List of IDs of any private subnets designated for transit gateway"
+#   value       = [for subnet in aws_subnet.private : subnet.id if length(regexall("tgw", subnet.tags.Name)) > 0]
+# }
 
 output "private_subnets_cidr_blocks" {
   description = "List of cidr_blocks of private subnets"
