@@ -174,114 +174,114 @@ resource "aws_route" "private_nat_gateway" {
   }
 }
 
-######################
-# VPC Endpoint for S3
-######################
-data "aws_vpc_endpoint_service" "s3" {
-  count        = var.enable_s3_endpoint ? 1 : 0
-  service      = "s3"
-  service_type = "Gateway"
-}
+# ######################
+# # VPC Endpoint for S3
+# ######################
+# data "aws_vpc_endpoint_service" "s3" {
+#   count        = var.enable_s3_endpoint ? 1 : 0
+#   service      = "s3"
+#   service_type = "Gateway"
+# }
 
-resource "aws_vpc_endpoint" "s3" {
-  count        = var.enable_s3_endpoint ? 1 : 0
-  vpc_id       = local.vpc_id
-  service_name = data.aws_vpc_endpoint_service.s3.0.service_name
-  tags         = var.tags
-}
+# resource "aws_vpc_endpoint" "s3" {
+#   count        = var.enable_s3_endpoint ? 1 : 0
+#   vpc_id       = local.vpc_id
+#   service_name = data.aws_vpc_endpoint_service.s3.0.service_name
+#   tags         = var.tags
+# }
 
-resource "aws_vpc_endpoint_route_table_association" "private_s3_ngw" {
-  count           = var.enable_s3_endpoint && var.enable_nat_gateway ? local.nat_gateway_count : 0
-  vpc_endpoint_id = aws_vpc_endpoint.s3.0.id
-  route_table_id  = element(aws_route_table.private_ngw.*.id, count.index)
-}
+# resource "aws_vpc_endpoint_route_table_association" "private_s3_ngw" {
+#   count           = var.enable_s3_endpoint && var.enable_nat_gateway ? local.nat_gateway_count : 0
+#   vpc_endpoint_id = aws_vpc_endpoint.s3.0.id
+#   route_table_id  = element(aws_route_table.private_ngw.*.id, count.index)
+# }
 
-resource "aws_vpc_endpoint_route_table_association" "public_s3" {
-  count           = var.enable_s3_endpoint && length(var.public_subnets) > 0 ? 1 : 0
-  vpc_endpoint_id = aws_vpc_endpoint.s3.0.id
-  route_table_id  = aws_route_table.public.0.id
-}
+# resource "aws_vpc_endpoint_route_table_association" "public_s3" {
+#   count           = var.enable_s3_endpoint && length(var.public_subnets) > 0 ? 1 : 0
+#   vpc_endpoint_id = aws_vpc_endpoint.s3.0.id
+#   route_table_id  = aws_route_table.public.0.id
+# }
 
-resource "aws_vpc_endpoint_route_table_association" "private_s3_tgw" {
-  count           = var.enable_s3_endpoint && var.transit_gateway_id != null ? 1 : 0
-  vpc_endpoint_id = aws_vpc_endpoint.s3.0.id
-  route_table_id  = element(aws_route_table.private_tgw.*.id, count.index)
-}
+# resource "aws_vpc_endpoint_route_table_association" "private_s3_tgw" {
+#   count           = var.enable_s3_endpoint && var.transit_gateway_id != null ? 1 : 0
+#   vpc_endpoint_id = aws_vpc_endpoint.s3.0.id
+#   route_table_id  = element(aws_route_table.private_tgw.*.id, count.index)
+# }
 
-######################
-# VPC Endpoint for Glue
-######################
-data "aws_vpc_endpoint_service" "glue" {
-  count   = var.enable_glue_endpoint ? 1 : 0
-  service = "glue"
-}
+# ######################
+# # VPC Endpoint for Glue
+# ######################
+# data "aws_vpc_endpoint_service" "glue" {
+#   count   = var.enable_glue_endpoint ? 1 : 0
+#   service = "glue"
+# }
 
-# resource "aws_vpc_endpoint" "glue" {
-#   count               = var.enable_glue_endpoint ? 1 : 0
+# # resource "aws_vpc_endpoint" "glue" {
+# #   count               = var.enable_glue_endpoint ? 1 : 0
+# #   vpc_id              = local.vpc_id
+# #   service_name        = data.aws_vpc_endpoint_service.glue.0.service_name
+# #   vpc_endpoint_type   = "Interface"
+# #   security_group_ids  = [aws_security_group.glue_endpoint[0].id]
+# #   subnet_ids          = local.vpce_subnets
+# #   private_dns_enabled = true
+# #   tags                = var.tags
+# # }
+
+# resource "aws_security_group" "glue_endpoint" {
+#   count       = var.enable_glue_endpoint ? 1 : 0
+#   name        = "vpce_glue"
+#   description = "Allow instances to access Glue interface endpoint over HTTPS"
+#   vpc_id      = local.vpc_id
+#   tags        = merge({"Name"="vpce_glue"}, var.tags)
+# }
+
+# resource "aws_security_group_rule" "glue_endpoint_rule" {
+#   count             = var.enable_glue_endpoint ? 1 : 0
+#   description       = "Allow instances in this subnet to access Glue interface endpoint over HTTPS"
+#   from_port         = 443
+#   protocol          = "tcp"
+#   security_group_id = aws_security_group.glue_endpoint[0].id
+#   to_port           = 443
+#   type              = "ingress"
+#   cidr_blocks       = [for subnet in aws_subnet.private : subnet.cidr_block]
+# }
+
+# ######################
+# # VPC Endpoint for KMS
+# ######################
+# data "aws_vpc_endpoint_service" "kms" {
+#   count   = var.enable_kms_endpoint ? 1 : 0
+#   service = "kms"
+# }
+
+# resource "aws_vpc_endpoint" "kms" {
+#   count               = var.enable_kms_endpoint ? 1 : 0
 #   vpc_id              = local.vpc_id
-#   service_name        = data.aws_vpc_endpoint_service.glue.0.service_name
+#   service_name        = data.aws_vpc_endpoint_service.kms.0.service_name
 #   vpc_endpoint_type   = "Interface"
-#   security_group_ids  = [aws_security_group.glue_endpoint[0].id]
+#   security_group_ids  = [aws_security_group.kms_endpoint[0].id]
 #   subnet_ids          = local.vpce_subnets
 #   private_dns_enabled = true
 #   tags                = var.tags
 # }
 
-resource "aws_security_group" "glue_endpoint" {
-  count       = var.enable_glue_endpoint ? 1 : 0
-  name        = "vpce_glue"
-  description = "Allow instances to access Glue interface endpoint over HTTPS"
-  vpc_id      = local.vpc_id
-  tags        = merge({"Name"="vpce_glue"}, var.tags)
-}
+# # resource "aws_security_group" "kms_endpoint" {
+# #   count       = var.enable_kms_endpoint ? 1 : 0
+# #   name        = "vpce_kms"
+# #   description = "Allow instances to access KMS interface endpoint over HTTPS"
+# #   vpc_id      = local.vpc_id
+# # }
 
-resource "aws_security_group_rule" "glue_endpoint_rule" {
-  count             = var.enable_glue_endpoint ? 1 : 0
-  description       = "Allow instances in this subnet to access Glue interface endpoint over HTTPS"
-  from_port         = 443
-  protocol          = "tcp"
-  security_group_id = aws_security_group.glue_endpoint[0].id
-  to_port           = 443
-  type              = "ingress"
-  cidr_blocks       = [for subnet in aws_subnet.private : subnet.cidr_block]
-}
-
-######################
-# VPC Endpoint for KMS
-######################
-data "aws_vpc_endpoint_service" "kms" {
-  count   = var.enable_kms_endpoint ? 1 : 0
-  service = "kms"
-}
-
-resource "aws_vpc_endpoint" "kms" {
-  count               = var.enable_kms_endpoint ? 1 : 0
-  vpc_id              = local.vpc_id
-  service_name        = data.aws_vpc_endpoint_service.kms.0.service_name
-  vpc_endpoint_type   = "Interface"
-  security_group_ids  = [aws_security_group.kms_endpoint[0].id]
-  subnet_ids          = local.vpce_subnets
-  private_dns_enabled = true
-  tags                = var.tags
-}
-
-# resource "aws_security_group" "kms_endpoint" {
-#   count       = var.enable_kms_endpoint ? 1 : 0
-#   name        = "vpce_kms"
-#   description = "Allow instances to access KMS interface endpoint over HTTPS"
-#   vpc_id      = local.vpc_id
+# resource "aws_security_group_rule" "kms_endpoint_rule" {
+#   count             = var.enable_kms_endpoint ? 1 : 0
+#   description       = "Allow instances in this subnet to access KMS interface endpoint over HTTPS"
+#   from_port         = 443
+#   protocol          = "tcp"
+#   security_group_id = aws_security_group.kms_endpoint[0].id
+#   to_port           = 443
+#   type              = "ingress"
+#   cidr_blocks       = [for subnet in aws_subnet.private : subnet.cidr_block]
 # }
-
-resource "aws_security_group_rule" "kms_endpoint_rule" {
-  count             = var.enable_kms_endpoint ? 1 : 0
-  description       = "Allow instances in this subnet to access KMS interface endpoint over HTTPS"
-  from_port         = 443
-  protocol          = "tcp"
-  security_group_id = aws_security_group.kms_endpoint[0].id
-  to_port           = 443
-  type              = "ingress"
-  cidr_blocks       = [for subnet in aws_subnet.private : subnet.cidr_block]
-}
 
 ####################################
 # VPC Endpoint for Secrets Manager
