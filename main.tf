@@ -40,8 +40,6 @@ resource "aws_vpc_dhcp_options" "this" {
   ntp_servers          = var.dhcp_options_ntp_servers
   netbios_name_servers = var.dhcp_options_netbios_name_servers
   netbios_node_type    = var.dhcp_options_netbios_node_type
-
-  tags = merge(map("Name", format("%s", var.name)), var.tags, var.dhcp_options_tags)
 }
 
 ###############################
@@ -165,14 +163,12 @@ locals {
 resource "aws_eip" "nat" {
   count = (var.enable_nat_gateway && ! var.reuse_nat_ips) ? local.nat_gateway_count : 0
   vpc   = true
-  tags  = merge(map("Name", format("%s-%s", var.name, element(var.azs, (var.single_nat_gateway ? 0 : count.index)))), var.tags, var.nat_eip_tags)
 }
 
 resource "aws_nat_gateway" "this" {
   count         = var.enable_nat_gateway ? local.nat_gateway_count : 0
   allocation_id = element(local.nat_gateway_ips, (var.single_nat_gateway ? 0 : count.index))
   subnet_id     = element([for subnet in aws_subnet.public : subnet.id], count.index)
-  tags          = merge(map("Name", format("%s-%s", var.name, element(var.azs, (var.single_nat_gateway ? 0 : count.index)))), var.tags, var.nat_gateway_tags)
 
   depends_on = [aws_internet_gateway.this]
 }
