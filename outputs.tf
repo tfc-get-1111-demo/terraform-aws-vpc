@@ -183,16 +183,6 @@ output "default_vpc_main_route_table_id" {
   value       = element(concat(aws_default_vpc.this.*.main_route_table_id, list("")), 0)
 }
 
-output vpc_flowlog_id {
-  description = "id of vpc flowlog"
-  value       = aws_flow_log.default.id
-}
-
-output vpc_flowlog_role_arn {
-  description = "vpc flow log arn"
-  value       = aws_iam_role.flowlog.arn
-}
-
 //output "default_vpc_ipv6_association_id" {
 //  description = "The association ID for the IPv6 CIDR block"
 //  value       = "${element(concat(aws_default_vpc.this.*.ipv6_association_id, list("")), 0)}"
