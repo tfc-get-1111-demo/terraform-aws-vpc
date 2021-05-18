@@ -17,8 +17,6 @@ resource "aws_vpc" "this" {
   enable_dns_hostnames             = var.enable_dns_hostnames
   enable_dns_support               = var.enable_dns_support
   assign_generated_ipv6_cidr_block = var.assign_generated_ipv6_cidr_block
-
-  tags = merge(map("Name", format("%s", var.name)), var.tags, var.vpc_tags)
 }
 
 resource "aws_vpc_ipv4_cidr_block_association" "this" {
@@ -605,7 +603,6 @@ resource "aws_default_vpc" "this" {
   enable_dns_support   = var.default_vpc_enable_dns_support
   enable_dns_hostnames = var.default_vpc_enable_dns_hostnames
   enable_classiclink   = var.default_vpc_enable_classiclink
-  tags                 = merge(map("Name", format("%s", var.default_vpc_name)), var.tags, var.default_vpc_tags)
 }
 
 resource "aws_default_security_group" "default" {
