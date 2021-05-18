@@ -216,16 +216,16 @@ data "aws_vpc_endpoint_service" "glue" {
   service = "glue"
 }
 
-resource "aws_vpc_endpoint" "glue" {
-  count               = var.enable_glue_endpoint ? 1 : 0
-  vpc_id              = local.vpc_id
-  service_name        = data.aws_vpc_endpoint_service.glue.0.service_name
-  vpc_endpoint_type   = "Interface"
-  security_group_ids  = [aws_security_group.glue_endpoint[0].id]
-  subnet_ids          = local.vpce_subnets
-  private_dns_enabled = true
-  tags                = var.tags
-}
+# resource "aws_vpc_endpoint" "glue" {
+#   count               = var.enable_glue_endpoint ? 1 : 0
+#   vpc_id              = local.vpc_id
+#   service_name        = data.aws_vpc_endpoint_service.glue.0.service_name
+#   vpc_endpoint_type   = "Interface"
+#   security_group_ids  = [aws_security_group.glue_endpoint[0].id]
+#   subnet_ids          = local.vpce_subnets
+#   private_dns_enabled = true
+#   tags                = var.tags
+# }
 
 resource "aws_security_group" "glue_endpoint" {
   count       = var.enable_glue_endpoint ? 1 : 0
@@ -265,12 +265,12 @@ resource "aws_vpc_endpoint" "kms" {
   tags                = var.tags
 }
 
-resource "aws_security_group" "kms_endpoint" {
-  count       = var.enable_kms_endpoint ? 1 : 0
-  name        = "vpce_kms"
-  description = "Allow instances to access KMS interface endpoint over HTTPS"
-  vpc_id      = local.vpc_id
-}
+# resource "aws_security_group" "kms_endpoint" {
+#   count       = var.enable_kms_endpoint ? 1 : 0
+#   name        = "vpce_kms"
+#   description = "Allow instances to access KMS interface endpoint over HTTPS"
+#   vpc_id      = local.vpc_id
+# }
 
 resource "aws_security_group_rule" "kms_endpoint_rule" {
   count             = var.enable_kms_endpoint ? 1 : 0
@@ -286,250 +286,250 @@ resource "aws_security_group_rule" "kms_endpoint_rule" {
 ####################################
 # VPC Endpoint for Secrets Manager
 ####################################
-data "aws_vpc_endpoint_service" "secrets" {
-  count   = var.enable_secrets_endpoint ? 1 : 0
-  service = "secretsmanager"
-}
+# data "aws_vpc_endpoint_service" "secrets" {
+#   count   = var.enable_secrets_endpoint ? 1 : 0
+#   service = "secretsmanager"
+# }
 
-resource "aws_vpc_endpoint" "secrets" {
-  count               = var.enable_secrets_endpoint ? 1 : 0
-  vpc_id              = local.vpc_id
-  service_name        = data.aws_vpc_endpoint_service.secrets.0.service_name
-  vpc_endpoint_type   = "Interface"
-  security_group_ids  = [aws_security_group.secrets_endpoint[0].id]
-  subnet_ids          = local.vpce_subnets
-  private_dns_enabled = true
-  tags                = var.tags
-}
+# resource "aws_vpc_endpoint" "secrets" {
+#   count               = var.enable_secrets_endpoint ? 1 : 0
+#   vpc_id              = local.vpc_id
+#   service_name        = data.aws_vpc_endpoint_service.secrets.0.service_name
+#   vpc_endpoint_type   = "Interface"
+#   security_group_ids  = [aws_security_group.secrets_endpoint[0].id]
+#   subnet_ids          = local.vpce_subnets
+#   private_dns_enabled = true
+#   tags                = var.tags
+# }
 
-resource "aws_security_group" "secrets_endpoint" {
-  count       = var.enable_secrets_endpoint ? 1 : 0
-  name        = "vpce_secrets"
-  description = "Allow instances to access Secrets interface endpoint over HTTPS"
-  vpc_id      = local.vpc_id
-}
+# resource "aws_security_group" "secrets_endpoint" {
+#   count       = var.enable_secrets_endpoint ? 1 : 0
+#   name        = "vpce_secrets"
+#   description = "Allow instances to access Secrets interface endpoint over HTTPS"
+#   vpc_id      = local.vpc_id
+# }
 
-resource "aws_security_group_rule" "secrets_endpoint_rule" {
-  count             = var.enable_secrets_endpoint ? 1 : 0
-  description       = "Allow instances in this subnet to access secrets interface endpoint over HTTPS"
-  from_port         = 443
-  protocol          = "tcp"
-  security_group_id = aws_security_group.secrets_endpoint[0].id
-  to_port           = 443
-  type              = "ingress"
-  cidr_blocks       = [for subnet in aws_subnet.private : subnet.cidr_block]
-}
+# resource "aws_security_group_rule" "secrets_endpoint_rule" {
+#   count             = var.enable_secrets_endpoint ? 1 : 0
+#   description       = "Allow instances in this subnet to access secrets interface endpoint over HTTPS"
+#   from_port         = 443
+#   protocol          = "tcp"
+#   security_group_id = aws_security_group.secrets_endpoint[0].id
+#   to_port           = 443
+#   type              = "ingress"
+#   cidr_blocks       = [for subnet in aws_subnet.private : subnet.cidr_block]
+# }
 
 ####################################
 # VPC Endpoint for SNS
 ####################################
-data "aws_vpc_endpoint_service" "sns" {
-  count   = var.enable_sns_endpoint ? 1 : 0
-  service = "sns"
-}
+# data "aws_vpc_endpoint_service" "sns" {
+#   count   = var.enable_sns_endpoint ? 1 : 0
+#   service = "sns"
+# }
 
-resource "aws_vpc_endpoint" "sns" {
-  count               = var.enable_sns_endpoint ? 1 : 0
-  vpc_id              = local.vpc_id
-  service_name        = data.aws_vpc_endpoint_service.sns.0.service_name
-  vpc_endpoint_type   = "Interface"
-  security_group_ids  = [aws_security_group.sns_endpoint[0].id]
-  subnet_ids          = local.vpce_subnets
-  private_dns_enabled = true
-  tags                = var.tags
-}
+# resource "aws_vpc_endpoint" "sns" {
+#   count               = var.enable_sns_endpoint ? 1 : 0
+#   vpc_id              = local.vpc_id
+#   service_name        = data.aws_vpc_endpoint_service.sns.0.service_name
+#   vpc_endpoint_type   = "Interface"
+#   security_group_ids  = [aws_security_group.sns_endpoint[0].id]
+#   subnet_ids          = local.vpce_subnets
+#   private_dns_enabled = true
+#   tags                = var.tags
+# }
 
-resource "aws_security_group" "sns_endpoint" {
-  count       = var.enable_sns_endpoint ? 1 : 0
-  name        = "vpce_sns"
-  description = "Allow instances to access SNS interface endpoint over HTTPS"
-  vpc_id      = local.vpc_id
-}
+# resource "aws_security_group" "sns_endpoint" {
+#   count       = var.enable_sns_endpoint ? 1 : 0
+#   name        = "vpce_sns"
+#   description = "Allow instances to access SNS interface endpoint over HTTPS"
+#   vpc_id      = local.vpc_id
+# }
 
-resource "aws_security_group_rule" "sns_endpoint_rule" {
-  count             = var.enable_sns_endpoint ? 1 : 0
-  description       = "Allow instances in this subnet to access SNS interface endpoint over HTTPS"
-  from_port         = 443
-  protocol          = "tcp"
-  security_group_id = aws_security_group.sns_endpoint[0].id
-  to_port           = 443
-  type              = "ingress"
-  cidr_blocks       = [for subnet in aws_subnet.private : subnet.cidr_block]
-}
+# resource "aws_security_group_rule" "sns_endpoint_rule" {
+#   count             = var.enable_sns_endpoint ? 1 : 0
+#   description       = "Allow instances in this subnet to access SNS interface endpoint over HTTPS"
+#   from_port         = 443
+#   protocol          = "tcp"
+#   security_group_id = aws_security_group.sns_endpoint[0].id
+#   to_port           = 443
+#   type              = "ingress"
+#   cidr_blocks       = [for subnet in aws_subnet.private : subnet.cidr_block]
+# }
 
-############################
-# VPC Endpoint for DynamoDB
-############################
-data "aws_vpc_endpoint_service" "dynamodb" {
-  count   = var.enable_dynamodb_endpoint ? 1 : 0
-  service = "dynamodb"
-}
+# ############################
+# # VPC Endpoint for DynamoDB
+# ############################
+# data "aws_vpc_endpoint_service" "dynamodb" {
+#   count   = var.enable_dynamodb_endpoint ? 1 : 0
+#   service = "dynamodb"
+# }
 
-resource "aws_vpc_endpoint" "dynamodb" {
-  count        = var.enable_dynamodb_endpoint ? 1 : 0
-  vpc_id       = local.vpc_id
-  service_name = data.aws_vpc_endpoint_service.dynamodb.0.service_name
-  tags         = var.tags
-}
+# resource "aws_vpc_endpoint" "dynamodb" {
+#   count        = var.enable_dynamodb_endpoint ? 1 : 0
+#   vpc_id       = local.vpc_id
+#   service_name = data.aws_vpc_endpoint_service.dynamodb.0.service_name
+#   tags         = var.tags
+# }
 
-resource "aws_vpc_endpoint_route_table_association" "private_dynamodb_ngw" {
-  count           = var.enable_dynamodb_endpoint && var.enable_nat_gateway ? local.nat_gateway_count : 0
-  vpc_endpoint_id = aws_vpc_endpoint.dynamodb.0.id
-  route_table_id  = element(aws_route_table.private_ngw.*.id, count.index)
-}
+# resource "aws_vpc_endpoint_route_table_association" "private_dynamodb_ngw" {
+#   count           = var.enable_dynamodb_endpoint && var.enable_nat_gateway ? local.nat_gateway_count : 0
+#   vpc_endpoint_id = aws_vpc_endpoint.dynamodb.0.id
+#   route_table_id  = element(aws_route_table.private_ngw.*.id, count.index)
+# }
 
-resource "aws_vpc_endpoint_route_table_association" "public_dynamodb" {
-  count           = var.enable_dynamodb_endpoint && length(var.public_subnets) > 0 ? 1 : 0
-  vpc_endpoint_id = aws_vpc_endpoint.dynamodb.0.id
-  route_table_id  = aws_route_table.public.0.id
-}
+# resource "aws_vpc_endpoint_route_table_association" "public_dynamodb" {
+#   count           = var.enable_dynamodb_endpoint && length(var.public_subnets) > 0 ? 1 : 0
+#   vpc_endpoint_id = aws_vpc_endpoint.dynamodb.0.id
+#   route_table_id  = aws_route_table.public.0.id
+# }
 
-resource "aws_vpc_endpoint_route_table_association" "private_dynamodb_tgw" {
-  count           = var.enable_dynamodb_endpoint && var.transit_gateway_id != null ? 1 : 0
-  vpc_endpoint_id = aws_vpc_endpoint.dynamodb.0.id
-  route_table_id  = element(aws_route_table.private_tgw.*.id, count.index)
-}
+# resource "aws_vpc_endpoint_route_table_association" "private_dynamodb_tgw" {
+#   count           = var.enable_dynamodb_endpoint && var.transit_gateway_id != null ? 1 : 0
+#   vpc_endpoint_id = aws_vpc_endpoint.dynamodb.0.id
+#   route_table_id  = element(aws_route_table.private_tgw.*.id, count.index)
+# }
 
-############################
-# VPC Endpoints for Session Manager
-############################
-data "aws_vpc_endpoint_service" "session_manager" {
-  service = "ssm"
-}
+# ############################
+# # VPC Endpoints for Session Manager
+# ############################
+# data "aws_vpc_endpoint_service" "session_manager" {
+#   service = "ssm"
+# }
 
-data "aws_vpc_endpoint_service" "session_manager_messages" {
-  service = "ssmmessages"
-}
+# data "aws_vpc_endpoint_service" "session_manager_messages" {
+#   service = "ssmmessages"
+# }
 
-data "aws_vpc_endpoint_service" "ec2_messages" {
-  service = "ec2messages"
-}
+# data "aws_vpc_endpoint_service" "ec2_messages" {
+#   service = "ec2messages"
+# }
 
-resource "aws_vpc_endpoint" "session_manager" {
-  count               = var.enable_session_manager_endpoints ? 1 : 0
-  service_name        = data.aws_vpc_endpoint_service.session_manager.service_name
-  vpc_id              = local.vpc_id
-  vpc_endpoint_type   = "Interface"
-  security_group_ids  = [aws_security_group.ssm_endpoint[0].id]
-  subnet_ids          = local.vpce_subnets
-  private_dns_enabled = true
-  tags                = var.tags
-}
+# resource "aws_vpc_endpoint" "session_manager" {
+#   count               = var.enable_session_manager_endpoints ? 1 : 0
+#   service_name        = data.aws_vpc_endpoint_service.session_manager.service_name
+#   vpc_id              = local.vpc_id
+#   vpc_endpoint_type   = "Interface"
+#   security_group_ids  = [aws_security_group.ssm_endpoint[0].id]
+#   subnet_ids          = local.vpce_subnets
+#   private_dns_enabled = true
+#   tags                = var.tags
+# }
 
-resource "aws_vpc_endpoint" "session_manager_messages" {
-  count               = var.enable_session_manager_endpoints ? 1 : 0
-  service_name        = data.aws_vpc_endpoint_service.session_manager_messages.service_name
-  vpc_id              = local.vpc_id
-  vpc_endpoint_type   = "Interface"
-  security_group_ids  = [aws_security_group.ssm_endpoint[0].id]
-  subnet_ids          = local.vpce_subnets
-  private_dns_enabled = true
-  tags                = var.tags
-}
+# resource "aws_vpc_endpoint" "session_manager_messages" {
+#   count               = var.enable_session_manager_endpoints ? 1 : 0
+#   service_name        = data.aws_vpc_endpoint_service.session_manager_messages.service_name
+#   vpc_id              = local.vpc_id
+#   vpc_endpoint_type   = "Interface"
+#   security_group_ids  = [aws_security_group.ssm_endpoint[0].id]
+#   subnet_ids          = local.vpce_subnets
+#   private_dns_enabled = true
+#   tags                = var.tags
+# }
 
-resource "aws_vpc_endpoint" "ec2_messages" {
-  count               = var.enable_session_manager_endpoints ? 1 : 0
-  service_name        = data.aws_vpc_endpoint_service.ec2_messages.service_name
-  vpc_id              = local.vpc_id
-  vpc_endpoint_type   = "Interface"
-  security_group_ids  = [aws_security_group.ssm_endpoint[0].id]
-  subnet_ids          = local.vpce_subnets
-  private_dns_enabled = true
-  tags                = var.tags
-}
+# resource "aws_vpc_endpoint" "ec2_messages" {
+#   count               = var.enable_session_manager_endpoints ? 1 : 0
+#   service_name        = data.aws_vpc_endpoint_service.ec2_messages.service_name
+#   vpc_id              = local.vpc_id
+#   vpc_endpoint_type   = "Interface"
+#   security_group_ids  = [aws_security_group.ssm_endpoint[0].id]
+#   subnet_ids          = local.vpce_subnets
+#   private_dns_enabled = true
+#   tags                = var.tags
+# }
 
-resource "aws_security_group" "ssm_endpoint" {
-  count       = var.enable_session_manager_endpoints ? 1 : 0
-  name        = "vpce_session_manager"
-  description = "Allow instances to access Session Manager interface endpoints over HTTPS"
-  vpc_id      = local.vpc_id
-}
+# resource "aws_security_group" "ssm_endpoint" {
+#   count       = var.enable_session_manager_endpoints ? 1 : 0
+#   name        = "vpce_session_manager"
+#   description = "Allow instances to access Session Manager interface endpoints over HTTPS"
+#   vpc_id      = local.vpc_id
+# }
 
-resource "aws_security_group_rule" "ssm_endpoint_rule" {
-  count             = var.enable_session_manager_endpoints ? 1 : 0
-  description       = "Allow instances in this subnet to access Session Manager interface endpoints over HTTPS"
-  from_port         = 443
-  protocol          = "tcp"
-  security_group_id = aws_security_group.ssm_endpoint[0].id
-  to_port           = 443
-  type              = "ingress"
-  cidr_blocks       = [for subnet in aws_subnet.private : subnet.cidr_block]
-}
+# resource "aws_security_group_rule" "ssm_endpoint_rule" {
+#   count             = var.enable_session_manager_endpoints ? 1 : 0
+#   description       = "Allow instances in this subnet to access Session Manager interface endpoints over HTTPS"
+#   from_port         = 443
+#   protocol          = "tcp"
+#   security_group_id = aws_security_group.ssm_endpoint[0].id
+#   to_port           = 443
+#   type              = "ingress"
+#   cidr_blocks       = [for subnet in aws_subnet.private : subnet.cidr_block]
+# }
 
-###################################
-# VPC Endpoint for STS
-####################################
-data "aws_vpc_endpoint_service" "sts" {
-  count   = var.enable_sts_endpoint ? 1 : 0
-  service = "sts"
-}
+# ###################################
+# # VPC Endpoint for STS
+# ####################################
+# data "aws_vpc_endpoint_service" "sts" {
+#   count   = var.enable_sts_endpoint ? 1 : 0
+#   service = "sts"
+# }
 
-resource "aws_vpc_endpoint" "sts" {
-  count               = var.enable_sts_endpoint ? 1 : 0
-  vpc_id              = local.vpc_id
-  service_name        = data.aws_vpc_endpoint_service.sts.0.service_name
-  vpc_endpoint_type   = "Interface"
-  security_group_ids  = [aws_security_group.sts_endpoint[0].id]
-  subnet_ids          = local.vpce_subnets
-  private_dns_enabled = true
-  tags                = var.tags
-}
+# resource "aws_vpc_endpoint" "sts" {
+#   count               = var.enable_sts_endpoint ? 1 : 0
+#   vpc_id              = local.vpc_id
+#   service_name        = data.aws_vpc_endpoint_service.sts.0.service_name
+#   vpc_endpoint_type   = "Interface"
+#   security_group_ids  = [aws_security_group.sts_endpoint[0].id]
+#   subnet_ids          = local.vpce_subnets
+#   private_dns_enabled = true
+#   tags                = var.tags
+# }
 
-resource "aws_security_group" "sts_endpoint" {
-  count       = var.enable_sts_endpoint ? 1 : 0
-  name        = "vpce_sts"
-  description = "Allow instances to access STS interface endpoint over HTTPS"
-  vpc_id      = local.vpc_id
-}
+# resource "aws_security_group" "sts_endpoint" {
+#   count       = var.enable_sts_endpoint ? 1 : 0
+#   name        = "vpce_sts"
+#   description = "Allow instances to access STS interface endpoint over HTTPS"
+#   vpc_id      = local.vpc_id
+# }
 
-resource "aws_security_group_rule" "sts_endpoint_rule" {
-  count             = var.enable_sts_endpoint ? 1 : 0
-  description       = "Allow instances in this subnet to access STS interface endpoint over HTTPS"
-  from_port         = 443
-  protocol          = "tcp"
-  security_group_id = aws_security_group.sts_endpoint[0].id
-  to_port           = 443
-  type              = "ingress"
-  cidr_blocks       = [for subnet in aws_subnet.private : subnet.cidr_block]
-}
+# resource "aws_security_group_rule" "sts_endpoint_rule" {
+#   count             = var.enable_sts_endpoint ? 1 : 0
+#   description       = "Allow instances in this subnet to access STS interface endpoint over HTTPS"
+#   from_port         = 443
+#   protocol          = "tcp"
+#   security_group_id = aws_security_group.sts_endpoint[0].id
+#   to_port           = 443
+#   type              = "ingress"
+#   cidr_blocks       = [for subnet in aws_subnet.private : subnet.cidr_block]
+# }
 
 
-######################
-# Generic VPC Interface Endpoints
-######################
+# ######################
+# # Generic VPC Interface Endpoints
+# ######################
 
-data "aws_vpc_endpoint_service" "vpc_interface_endpoints" {
-  for_each = toset(var.vpc_interface_endpoints)
-  service = each.key
-}
+# data "aws_vpc_endpoint_service" "vpc_interface_endpoints" {
+#   for_each = toset(var.vpc_interface_endpoints)
+#   service = each.key
+# }
 
-resource "aws_vpc_endpoint" "vpc_interface_endpoints" {
-  for_each            = toset(var.vpc_interface_endpoints)
-  vpc_id              = local.vpc_id
-  service_name        = data.aws_vpc_endpoint_service.vpc_interface_endpoints[each.key].service_name
-  vpc_endpoint_type   = "Interface"
-  private_dns_enabled = true
-  subnet_ids          = local.vpce_subnets
-  security_group_ids  = [aws_security_group.vpc_interface_endpoints[each.key].id]
-}
+# resource "aws_vpc_endpoint" "vpc_interface_endpoints" {
+#   for_each            = toset(var.vpc_interface_endpoints)
+#   vpc_id              = local.vpc_id
+#   service_name        = data.aws_vpc_endpoint_service.vpc_interface_endpoints[each.key].service_name
+#   vpc_endpoint_type   = "Interface"
+#   private_dns_enabled = true
+#   subnet_ids          = local.vpce_subnets
+#   security_group_ids  = [aws_security_group.vpc_interface_endpoints[each.key].id]
+# }
 
-resource "aws_security_group" "vpc_interface_endpoints" {
-  for_each    = toset(var.vpc_interface_endpoints)
-  name        = "vpce_${each.key}"
-  description = "Allow instances to access ${each.key} interface endpoint over HTTPS"
-  vpc_id      = local.vpc_id
-}
+# resource "aws_security_group" "vpc_interface_endpoints" {
+#   for_each    = toset(var.vpc_interface_endpoints)
+#   name        = "vpce_${each.key}"
+#   description = "Allow instances to access ${each.key} interface endpoint over HTTPS"
+#   vpc_id      = local.vpc_id
+# }
 
-resource "aws_security_group_rule" "vpc_interface_endpoints" {
-  for_each          = toset(var.vpc_interface_endpoints)
-  description       = "Allow instances in this subnet to access ${each.key} interface endpoint over HTTPS"
-  from_port         = 443
-  to_port           = 443
-  type              = "ingress"
-  protocol          = "tcp"
-  cidr_blocks       = [for subnet in aws_subnet.private : subnet.cidr_block]
-  security_group_id = aws_security_group.vpc_interface_endpoints[each.key].id
-}
+# resource "aws_security_group_rule" "vpc_interface_endpoints" {
+#   for_each          = toset(var.vpc_interface_endpoints)
+#   description       = "Allow instances in this subnet to access ${each.key} interface endpoint over HTTPS"
+#   from_port         = 443
+#   to_port           = 443
+#   type              = "ingress"
+#   protocol          = "tcp"
+#   cidr_blocks       = [for subnet in aws_subnet.private : subnet.cidr_block]
+#   security_group_id = aws_security_group.vpc_interface_endpoints[each.key].id
+# }
 
 ##########################
 # Route table association
